@@ -15,13 +15,22 @@ async def main():
 
     road_texture = pg.image.load("assets/road.png").convert()
     car_sprite = pg.image.load("assets/m4.png").convert_alpha()
-    mountains_texture = pg.image.load("assets/mountains.png").convert()
-    ##mountains_texture = pg.transform.scale(mountains_texture, (int(mountains_texture.get_size()[0]/7), int(mountains_texture.get_size()[1]/7)))
     
     car_sprite.set_colorkey((255, 0, 255))
     car_sprite = pg.transform.scale(car_sprite, (int(car_sprite.get_size()[0]/3), int(car_sprite.get_size()[1]/3)))
+
+    oncoming_car_sprites = [
+        pg.image.load("assets/civic.png").convert_alpha(),
+        pg.image.load("assets/soul.png").convert_alpha()
+    ]
+
+    for sprite in oncoming_car_sprites:
+        sprite.set_colorkey((255, 0, 255))
+
     
     car = Player()
+    cars = [OncomingCar(-50, oncoming_car_sprites), OncomingCar(-17, oncoming_car_sprites), OncomingCar(7, oncoming_car_sprites)]
+
 
     running = 1
 
@@ -34,14 +43,12 @@ async def main():
             if event.type == pg.QUIT:
                 running = 0
 
-        ##screen.blit(mountains_texture, ( - car.angle*82, -100))
         screen.fill((100, 150, 200))
-
-        ##pg.draw.circle(screen, (60, 80, 70), (100 - car.angle*82, SCREEN_HEIGHT/2), 50)
 
         vertical = 180
         x = car.x
         car.z = calc_z(car.x)
+        z_buffer = [999 for element in range(180)]
         draw_distance = 1
 
         while draw_distance < 120:
@@ -50,10 +57,11 @@ async def main():
                 draw_distance += draw_distance/150
                 x = car.x + draw_distance
                 scale = 1/draw_distance
-                z = calc_z(x) - car.z ## VERY IMPORTANT THAT THIS MATCHES THE CAR HEIGHT EQUATION
+                z = calc_z(x) - car.z
                 vertical = int(60+160*scale + z*scale)
 
             if draw_distance < 120:
+                z_buffer[int(vertical)] = draw_distance
                 road_slice = road_texture.subsurface((0, 10*x%225, 225, 1))
                 '''
                 ## A desert-like color scheme
@@ -77,7 +85,16 @@ async def main():
                 )
                 '''
                 pg.draw.rect(screen, color, (0, vertical, SCREEN_WIDTH, 1))
-                render_element(screen, road_slice, 500*scale, 1, scale, x, car)
+                render_element(screen, road_slice, 500*scale, 1, scale, x, car, car.y, z_buffer)
+        
+        for index in reversed(range(len(cars)-1)):
+            scale = max(0.0001, 1/(cars[index].x - car.x))
+            render_element(screen, cars[index].sprite, 150*scale, 120*scale, scale, cars[index].x, car, -70+car.y, z_buffer)
+            cars[index].x -= 10*delta
+
+        if cars[0].x < car.x+1:
+            cars.pop(0)
+            cars.append(OncomingCar(car.x, oncoming_car_sprites))
 
         screen.blit(car_sprite, (SCREEN_WIDTH/2 - 43.5 - car.sprite_offset, SCREEN_HEIGHT/2))
         pg.display.update()
@@ -89,15 +106,21 @@ def calc_y(x):
 def calc_z(x):
     return 200+80*math.sin(x/13) - 120*math.sin(x/7)
 
-def render_element(screen, sprite, width, height, scale, x, car):
-    y = calc_y(x) - car.y
+def render_element(screen, sprite, width, height, scale, x, car, y, z_buffer):
+    y = calc_y(x) - y
     z = calc_z(x) - car.z
 
     vertical = int(60+160*scale + z*scale)
-    horizontal = 160-(160-y)*scale + car.angle*(vertical-150)
+    if vertical >= 1 and vertical < 180 and z_buffer[vertical-1] > 1/scale - 10:
+        horizontal = 160-(160-y)*scale + car.angle*(vertical-150)
 
-    scaled_sprite = pg.transform.scale(sprite, (width, height))
-    screen.blit(scaled_sprite, (horizontal, vertical))
+        scaled_sprite = pg.transform.scale(sprite, (width, height))
+        screen.blit(scaled_sprite, (horizontal, vertical - height+1))
+
+class OncomingCar():
+    def __init__(self, distance, car_sprites):
+        self.sprite = random.choice(car_sprites)
+        self.x = distance + random.randint(90, 110)
 
 class Player():
     def __init__(self):
