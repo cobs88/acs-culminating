@@ -19,23 +19,21 @@ async def main():
     car_sprite.set_colorkey((255, 0, 255))
     car_sprite = pg.transform.scale(car_sprite, (int(car_sprite.get_size()[0]/3), int(car_sprite.get_size()[1]/3)))
 
-    oncoming_car_sprites = [
-        pg.image.load("assets/civic.png").convert_alpha(),
-        pg.image.load("assets/soul.png").convert_alpha()
-    ]
+    themes = load_themes()
+
+    current_theme = "DESERT"
+
+    road_texture, oncoming_car_sprites, obstacle_sprite, color_scheme = set_theme(current_theme, themes)
 
     for sprite in oncoming_car_sprites:
         sprite.set_colorkey((255, 0, 255))
 
-    
     car = Player()
     cars = [OncomingCar(-50, oncoming_car_sprites), OncomingCar(-17, oncoming_car_sprites), OncomingCar(7, oncoming_car_sprites)]
-
 
     running = 1
 
     while running:
-
         delta = clock.tick(FPS)/1000
         car.controls(delta)
 
@@ -63,27 +61,13 @@ async def main():
             if draw_distance < 120:
                 z_buffer[int(vertical)] = draw_distance
                 road_slice = road_texture.subsurface((0, 10*x%225, 225, 1))
-                '''
-                ## A desert-like color scheme
+
                 color = (
-                    int(180 - draw_distance / 3),
-                    int(140 - draw_distance/ 2),
-                    int(80+10*math.sin(x))
+                    int(color_scheme[0] - draw_distance / 3),
+                    int(color_scheme[1] - draw_distance / 2),
+                    int(color_scheme[2] + 10*math.sin(x))
                 )
-                '''
-                ## A snowy-like color scheme
-                color = (
-                    int(230 - draw_distance / 3),
-                    int(230 - draw_distance / 2),
-                    int(230+10*math.sin(x))
-                )
-                '''
-                color = (
-                    int(100 - draw_distance / 3),
-                    int(180 - draw_distance / 2),
-                    int(100 + 10 * math.sin(x))
-                )
-                '''
+
                 pg.draw.rect(screen, color, (0, vertical, SCREEN_WIDTH, 1))
                 render_element(screen, road_slice, 500*scale, 1, scale, x, car, car.y, z_buffer)
         
@@ -91,7 +75,8 @@ async def main():
             scale = max(0.0001, 1/(cars[index].x - car.x))
             render_element(screen, cars[index].sprite, 150*scale, 120*scale, scale, cars[index].x, car, -70+car.y, z_buffer)
             cars[index].x -= 10*delta
-
+        
+        ## makes new cars spawn once one leaves the screen
         if cars[0].x < car.x+1:
             cars.pop(0)
             cars.append(OncomingCar(car.x, oncoming_car_sprites))
@@ -122,10 +107,100 @@ class OncomingCar():
         self.sprite = random.choice(car_sprites)
         self.x = distance + random.randint(90, 110)
 
+class Theme:
+    def __init__(self, road_texture, car_sprites, obstacle_data, color_scheme):
+        self.road_texture = road_texture
+        self.car_sprites = car_sprites
+        self.obstacle_data = obstacle_data
+        self.color_scheme = color_scheme
+
+    def get_obstacle(self, obstacle_type=None):
+        if obstacle_type:
+            pass
+        else:
+            obstacle_type = self.current_theme.get_random_obstacle()
+
+        sprite = random.choice(self.obstacle_data[obstacle_type])
+
+        return Obstacle(sprite, obstacle_type)
+
+def load_themes():
+    desert_theme = Theme(
+        road_texture=pg.image.load("assets/road.png").convert(),
+        car_sprites=[
+            pg.image.load("assets/civic.png").convert_alpha(),
+            pg.image.load("assets/soul.png").convert_alpha()
+        ],
+        obstacle_data = {
+            'bush': [
+                pg.image.load("assets/tree.png").convert_alpha(),
+                pg.image.load("assets/tree.png").convert_alpha()
+            ],
+
+            'cactus': [
+                pg.image.load("assets/tree.png").convert_alpha(),
+                pg.image.load("assets/tree.png").convert_alpha()
+            ]
+        },
+        color_scheme=(180, 140, 80),  # Desert color
+    )
+    
+    # Load snowy theme assets
+    snowy_theme = Theme(
+        road_texture=pg.image.load("assets/road.png").convert(),
+        car_sprites=[
+            pg.image.load("assets/civic.png").convert_alpha(),
+            pg.image.load("assets/soul.png").convert_alpha()
+        ],
+        obstacle_data = {
+            'snowy_tree': [
+                pg.image.load("assets/tree.png").convert_alpha(),
+                pg.image.load("assets/tree.png").convert_alpha()
+            ],
+            'snowman': [
+                pg.image.load("assets/tree.png").convert_alpha(),
+                pg.image.load("assets/tree.png").convert_alpha()
+            ]
+        },
+        color_scheme=(230, 230, 230)  # Snowy color
+    )
+    
+    # Load normal theme assets
+    forest_theme = Theme(
+        road_texture=pg.image.load("assets/road.png").convert(),
+        car_sprites=[
+            pg.image.load("assets/civic.png").convert_alpha(),
+            pg.image.load("assets/soul.png").convert_alpha()
+        ],
+        obstacle_data = {
+            'tree': [
+                pg.image.load("assets/tree.png").convert_alpha(),
+                pg.image.load("assets/tree.png").convert_alpha()
+            ]
+        },
+        color_scheme=(100, 180, 100)  # Forest/normal colors
+    )
+
+    return {
+        "DESERT": desert_theme,
+        "SNOWY": snowy_theme,
+        "FOREST": forest_theme
+    }
+
+def set_theme(theme_name, themes):
+    current_theme = themes[theme_name]
+
+    road_texture = current_theme.road_texture
+    car_sprites = current_theme.car_sprites
+    obstacle_data = current_theme.obstacle_data
+    color_scheme = current_theme.color_scheme
+
+    return road_texture, car_sprites, obstacle_data, color_scheme
+
 class Player():
     def __init__(self):
         self.x = 0
-        self.y = 300
+        self.y = 500
         self.z = 0
         self.angle = 0
         self.velocity = 0
@@ -135,8 +210,6 @@ class Player():
 
         self.prev_angle = 0
         self.angle_change = 0
-
-
 
     def controls(self, delta):
         pressed_keys = pg.key.get_pressed()
