@@ -2,6 +2,9 @@ import asyncio
 import pygame as pg
 import sys, platform, math, random
 
+from player import Player
+from themes import load_themes, set_theme
+
 async def main():
     SCREEN_WIDTH = 320
     SCREEN_HEIGHT = 180
@@ -23,13 +26,14 @@ async def main():
 
     current_theme = "DESERT"
 
-    road_texture, oncoming_car_sprites, obstacle_sprite, color_scheme = set_theme(current_theme, themes)
+    road_texture, oncoming_car_sprites, obstacle_sprites, color_scheme = set_theme(current_theme, themes)
 
     for sprite in oncoming_car_sprites:
         sprite.set_colorkey((255, 0, 255))
 
     car = Player()
     cars = [OncomingCar(-50, oncoming_car_sprites), OncomingCar(-17, oncoming_car_sprites), OncomingCar(7, oncoming_car_sprites)]
+    obstacles = [Obstacle(-67, obstacle_sprites), Obstacle(-55, obstacle_sprites), Obstacle(-43, obstacle_sprites), Obstacle(-33, obstacle_sprites), Obstacle(-25, obstacle_sprites), Obstacle(-13, obstacle_sprites), Obstacle(-3, obstacle_sprites)]
 
     running = 1
 
@@ -81,6 +85,14 @@ async def main():
             cars.pop(0)
             cars.append(OncomingCar(car.x, oncoming_car_sprites))
 
+        for index in reversed(range(len(obstacles) - 1)):
+            scale = max(0.0001, 1/(obstacles[index].x - car.x))
+            render_element(screen, obstacles[index].sprite, 200*scale, 300*scale, scale, obstacles[index].x, car, obstacles[index].y+car.y, z_buffer)
+
+        if obstacles[0].x < car.x+1:
+            obstacles.pop(0)
+            obstacles.append(Obstacle(obstacles[-1].x, obstacle_sprites))
+
         screen.blit(car_sprite, (SCREEN_WIDTH/2 - 43.5 - car.sprite_offset, SCREEN_HEIGHT/2))
         pg.display.update()
         await asyncio.sleep(0)
@@ -102,154 +114,16 @@ def render_element(screen, sprite, width, height, scale, x, car, y, z_buffer):
         scaled_sprite = pg.transform.scale(sprite, (width, height))
         screen.blit(scaled_sprite, (horizontal, vertical - height+1))
 
+class Obstacle():
+    def __init__(self, distance, obstacle_sprites):
+        self.sprite = random.choice(obstacle_sprites)
+        self.x = distance + random.randint(10, 20) + 0.5
+        self.y = random.randint(500, 1500) * random.choice([-1, 1])
+
 class OncomingCar():
     def __init__(self, distance, car_sprites):
         self.sprite = random.choice(car_sprites)
         self.x = distance + random.randint(90, 110)
-
-class Theme:
-    def __init__(self, road_texture, car_sprites, obstacle_data, color_scheme):
-        self.road_texture = road_texture
-        self.car_sprites = car_sprites
-        self.obstacle_data = obstacle_data
-        self.color_scheme = color_scheme
-
-    def get_obstacle(self, obstacle_type=None):
-        if obstacle_type:
-            pass
-        else:
-            obstacle_type = self.current_theme.get_random_obstacle()
-
-        sprite = random.choice(self.obstacle_data[obstacle_type])
-
-        return Obstacle(sprite, obstacle_type)
-
-def load_themes():
-    desert_theme = Theme(
-        road_texture=pg.image.load("assets/road.png").convert(),
-        car_sprites=[
-            pg.image.load("assets/civic.png").convert_alpha(),
-            pg.image.load("assets/soul.png").convert_alpha()
-        ],
-        obstacle_data = {
-            'bush': [
-                pg.image.load("assets/tree.png").convert_alpha(),
-                pg.image.load("assets/tree.png").convert_alpha()
-            ],
-
-            'cactus': [
-                pg.image.load("assets/tree.png").convert_alpha(),
-                pg.image.load("assets/tree.png").convert_alpha()
-            ]
-        },
-        color_scheme=(180, 140, 80),  # Desert color
-    )
-    
-    # Load snowy theme assets
-    snowy_theme = Theme(
-        road_texture=pg.image.load("assets/road.png").convert(),
-        car_sprites=[
-            pg.image.load("assets/civic.png").convert_alpha(),
-            pg.image.load("assets/soul.png").convert_alpha()
-        ],
-        obstacle_data = {
-            'snowy_tree': [
-                pg.image.load("assets/tree.png").convert_alpha(),
-                pg.image.load("assets/tree.png").convert_alpha()
-            ],
-            'snowman': [
-                pg.image.load("assets/tree.png").convert_alpha(),
-                pg.image.load("assets/tree.png").convert_alpha()
-            ]
-        },
-        color_scheme=(230, 230, 230)  # Snowy color
-    )
-    
-    # Load normal theme assets
-    forest_theme = Theme(
-        road_texture=pg.image.load("assets/road.png").convert(),
-        car_sprites=[
-            pg.image.load("assets/civic.png").convert_alpha(),
-            pg.image.load("assets/soul.png").convert_alpha()
-        ],
-        obstacle_data = {
-            'tree': [
-                pg.image.load("assets/tree.png").convert_alpha(),
-                pg.image.load("assets/tree.png").convert_alpha()
-            ]
-        },
-        color_scheme=(100, 180, 100)  # Forest/normal colors
-    )
-
-    return {
-        "DESERT": desert_theme,
-        "SNOWY": snowy_theme,
-        "FOREST": forest_theme
-    }
-
-def set_theme(theme_name, themes):
-    current_theme = themes[theme_name]
-
-    road_texture = current_theme.road_texture
-    car_sprites = current_theme.car_sprites
-    obstacle_data = current_theme.obstacle_data
-    color_scheme = current_theme.color_scheme
-
-    return road_texture, car_sprites, obstacle_data, color_scheme
-
-class Player():
-    def __init__(self):
-        self.x = 0
-        self.y = 500
-        self.z = 0
-        self.angle = 0
-        self.velocity = 0
-        self.acceleration = 0
-
-        self.sprite_offset = 0
-
-        self.prev_angle = 0
-        self.angle_change = 0
-
-    def controls(self, delta):
-        pressed_keys = pg.key.get_pressed()
-        self.acceleration += -0.5*self.acceleration*delta
-        self.velocity += -0.5*self.velocity*delta
-        
-        if pressed_keys[pg.K_w] or pressed_keys[pg.K_UP]:
-            if self.velocity > -1:
-                self.acceleration += 4*delta
-            else:
-                self.acceleration = 0
-                self.velocity += -self.velocity*delta
-
-        elif pressed_keys[pg.K_s] or pressed_keys[pg.K_DOWN]:
-            if self.velocity < 1:
-                self.acceleration -= delta
-            else:
-                self.acceleration = 0
-                self.velocity += -self.velocity*delta
-        if pressed_keys[pg.K_a] or pressed_keys[pg.K_LEFT]:
-            self.angle -= delta*self.velocity/30
-        elif pressed_keys[pg.K_d] or pressed_keys[pg.K_RIGHT]:
-            self.angle += delta*self.velocity/30
-
-        self.velocity = max(-10, min(self.velocity, 20))
-        self.angle = max(-0.8, (min(0.8, self.angle)))
-        self.velocity += self.acceleration*delta
-        self.x += self.velocity*delta*math.cos(self.angle)
-        self.y += self.velocity*math.sin(self.angle)*delta*100
-        self.y = max(-1000, self.y)
-        self.y = min(1000, self.y)
-
-        self.angle_change = self.angle - self.prev_angle
-
-
-        target_offset = self.angle_change * 5000
-        smoothing_factor = 1
-        self.sprite_offset += (target_offset - self.sprite_offset) * delta * smoothing_factor
-
-        self.prev_angle = self.angle
 
 if __name__ == "__main__":
     pg.init()
