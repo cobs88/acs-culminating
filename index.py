@@ -63,6 +63,7 @@ class Button:
         self.text = text
         self.grow = 0  # For smooth animation
         self.was_clicked = False  # To track individual clicks
+        self.was_hovered = False  # To track hover state
 
     def draw(self, surface):
         mouse_pos = pygame.mouse.get_pos()
@@ -70,10 +71,14 @@ class Button:
 
         # Smooth size increase on hover
         if is_hovered:
+            if not self.was_hovered:
+                hover_sound.play()
+            self.was_hovered = True
             if self.grow < 10:
                 self.grow += 4
             surface_color = self.hover_color
         else:
+            self.was_hovered = False
             if self.grow > 0:
                 self.grow -= 2
             surface_color = self.base_color
@@ -104,6 +109,7 @@ class Button:
         clicked = self.rect.collidepoint(mouse_pos) and pygame.mouse.get_pressed()[0]
         if clicked and not self.was_clicked:
             self.was_clicked = True
+            click_sound.play()
             return True
         if not pygame.mouse.get_pressed()[0]:
             self.was_clicked = False
@@ -139,7 +145,7 @@ settings_button = Button(WIDTH // 2 - 200, HEIGHT // 2 - 30, 400, 100, "Settings
 quit_button = Button(WIDTH // 2 - 200, HEIGHT // 2 + 90, 400, 100, "Quit", GRAY, DARK_GRAY)
 
 # Settings Menu
-close_button = Button(WIDTH - 200, 0, 140, 70, "X", RED, RED)  # Adjusted position and size
+close_button = Button(WIDTH - 200, 20, 50, 50, "", RED, RED)  # Adjusted position and size
 volume_slider = Slider(WIDTH // 2 - 150, HEIGHT // 2, 300, 1, 100, 50)
 day_night_toggle = Button(WIDTH // 2 - 150, HEIGHT // 2 + 100, 300, 50, "Day", DARK_YELLOW, DARK_YELLOW)
 
@@ -203,6 +209,10 @@ while running:
         if in_settings:
             volume_slider.handle_event(event)
 
+    # Play click sound for general clicks
+    if pygame.mouse.get_pressed()[0]:
+        click_sound.play()
+
     # Main menu logic
     if not in_settings:
         # Blend between backgrounds
@@ -244,9 +254,9 @@ while running:
     else:
         screen.fill(DARK_GRAY if not is_day else GRAY)
 
-        exit_button = Button(1600, 800, 100, 100, exitImage, 0.8, RED)
         volume_slider.draw(screen, DARK_YELLOW if is_day else BLUE)
         day_night_toggle.draw(screen)
+        close_button.draw(screen)
 
         # Display volume value
         volume_text = font_settings.render(f"Volume: {int(volume_slider.value)}", True, WHITE)
@@ -259,7 +269,7 @@ while running:
             day_night_toggle.base_color = DARK_YELLOW if is_day else NAVY_BLUE
             day_night_toggle.hover_color = DARK_YELLOW if is_day else NAVY_BLUE
 
-        if exit_button.is_clicked():
+        if close_button.is_clicked():
             in_settings = False
 
         # Adjust volume
