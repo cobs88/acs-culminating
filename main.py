@@ -28,25 +28,22 @@ async def main():
 
     current_theme = "DESERT"
 
-    road_texture, oncoming_car_sprites, obstacle_sprites, color_scheme = set_theme(current_theme, themes)
-
-    for sprite in oncoming_car_sprites:
-        sprite.set_colorkey((255, 0, 255))
+    road_texture, color_scheme = set_theme(current_theme, themes)
 
     car = Player()
 
-    game_objects = [
-        OncomingCar(-50, oncoming_car_sprites), 
-        OncomingCar(-17, oncoming_car_sprites), 
-        OncomingCar(7, oncoming_car_sprites),
-        StaticObject(-67, obstacle_sprites), 
-        StaticObject(-55, obstacle_sprites), 
-        StaticObject(-43, obstacle_sprites), 
-        StaticObject(-33, obstacle_sprites), 
-        StaticObject(-25, obstacle_sprites), 
-        StaticObject(-13, obstacle_sprites), 
-        StaticObject(-3, obstacle_sprites)
-    ]
+    game_objects = []
+
+    for i in range(6):
+        distance = car.x + i * 50 + random.randint(-10, 10)
+        game_objects.append(OncomingCar(distance))
+
+    for i in range(20):
+        distance = car.x + i * 7 + random.randint(-10, 10)
+        obstacle = themes[current_theme].spawn_obstacle(distance)
+        game_objects.append(obstacle)
+
+
 
     running = 1
 
@@ -88,6 +85,16 @@ async def main():
                 pg.draw.rect(screen, color, (0, vertical, SCREEN_WIDTH, 1))
                 render_element(screen, road_slice, 500*scale, 1, scale, x, car, car.y, z_buffer)
         
+        for i in range(len(game_objects) - 1, -1, -1):
+            obj = game_objects[i]
+            isbehindcar = obj.update(delta, car)
+            if isbehindcar:
+                new_object = obj.__class__(car.x + 130 + random.randint(-10, 10))
+                game_objects.append(new_object)
+
+                game_objects.pop(i)
+
+
         for obj in game_objects:
             obj.update(delta, car)
         
