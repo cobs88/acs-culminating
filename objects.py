@@ -9,7 +9,7 @@ class GameObject:
         self.h_scale_factor = 200
         self.x = distance
         self.y = None
-
+        
     def render(self, screen, car, z_buffer):
         scale = max(0.0001, 1 / (self.x - car.x))
         render_element(screen, self.sprite, scale * self.w_scale_factor, scale * self.h_scale_factor, scale, self.x, car, self.y + car.y, z_buffer)
@@ -34,6 +34,33 @@ class Cactus(StaticObject):
         self.sprite = pg.image.load("assets/cactus.png").convert_alpha()
         self.w_scale_factor = 300
         self.h_scale_factor = 300
+
+class Snowman(StaticObject):
+    def __init__(self, distance):
+        super().__init__(distance)
+
+        self.sprite = pg.image.load("assets/snowman.png").convert_alpha()
+
+        self.w_scale_factor = 150
+        self.h_scale_factor = 150
+
+class ChristmasTree(StaticObject):
+    def __init__(self, distance):
+        super().__init__(distance)
+
+        self.sprite = pg.image.load("assets/christmas_tree.png").convert_alpha()
+
+        self.w_scale_factor = 400
+        self.h_scale_factor = 400
+
+class Tree(StaticObject):
+    def __init__(self, distance):
+        super().__init__(distance)
+
+        self.sprite = pg.image.load("assets/tree.png").convert_alpha()
+
+        self.w_scale_factor = 400
+        self.h_scale_factor = 400
 
 class OncomingCar(GameObject):
     def __init__(self, distance):

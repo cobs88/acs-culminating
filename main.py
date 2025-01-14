@@ -34,7 +34,7 @@ async def main():
 
     game_objects = []
 
-    for i in range(6):
+    for i in range(3):
         distance = car.x + i * 50 + random.randint(-10, 10)
         game_objects.append(OncomingCar(distance))
 
@@ -94,6 +94,7 @@ async def main():
 
                 game_objects.pop(i)
 
+        game_objects = sorted(game_objects, key=lambda obj: obj.x)
 
         for obj in game_objects:
             obj.update(delta, car)

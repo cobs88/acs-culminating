@@ -12,6 +12,10 @@ class Theme:
     def spawn_obstacle(self, distance):
         if self.theme == "DESERT":
             return Cactus(distance)
+        elif self.theme == "SNOWY":
+            return random.choice([Snowman(distance), ChristmasTree(distance)])
+        elif self.theme == "FOREST":
+            return Tree(distance)
         else:
             return StaticObject(distance)
 
@@ -33,7 +37,7 @@ def load_themes():
     forest_theme = Theme(
         "FOREST",
         road_texture=pg.image.load("assets/road.png").convert(),
-        color_scheme=(100, 180, 100)  # Forest/normal colors
+        color_scheme=(50, 180, 50)  # Forest/normal colors
     )
 
     return {
