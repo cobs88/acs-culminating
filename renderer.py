@@ -44,7 +44,6 @@ def draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_sche
     draw_mountain(screen, SCREEN_WIDTH // 3 - offset, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 2 + 60, MOUNTAIN_COLOR)  # Mid smaller mountain
     draw_mountain(screen, SCREEN_WIDTH // 1.75 - offset, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 2 + 60, MOUNTAIN_COLOR)  # Mid smaller mountain (other side)
 
-
 def draw_mountain(screen, x_offset, width, height, color):
     points = [
         (x_offset, height), 

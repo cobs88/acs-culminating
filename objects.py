@@ -77,7 +77,6 @@ class OncomingCar(GameObject):
         self.w_scale_factor = 150
         self.h_scale_factor = 120
 
-
     def update(self, delta, car):
         self.x -= 5*delta
         if self.x < car.x + 1:

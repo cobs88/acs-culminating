@@ -151,7 +151,7 @@ loading_width = 500
 loading_height = 20
 loading_x = (WIDTH - loading_width) // 2
 loading_y = HEIGHT // 2 - 100
-car_image = pygame.image.load('assets/car.png')
+car_image = pygame.image.load('car.png')
 car_image = pygame.transform.scale(car_image, (240, 120))
 
 # Main loop
