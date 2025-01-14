@@ -5,7 +5,7 @@ import sys, platform, math, random
 from player import Player
 from themes import load_themes, set_theme
 from objects import OncomingCar, StaticObject
-from renderer import render_element
+from renderer import render_element, draw_background
 
 async def main():
     SCREEN_WIDTH = 320
@@ -26,7 +26,7 @@ async def main():
 
     themes = load_themes()
 
-    current_theme = "DESERT"
+    current_theme = "SNOWY"
 
     road_texture, color_scheme = set_theme(current_theme, themes)
 
@@ -46,6 +46,7 @@ async def main():
 
 
     running = 1
+    time_of_day = 0
 
     while running:
         delta = clock.tick(FPS)/1000
@@ -54,9 +55,9 @@ async def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = 0
-
-        screen.fill((100, 150, 200))
-
+                
+        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_scheme)
+        
         vertical = 180
         x = car.x
         car.z = calc_z(car.x)
