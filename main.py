@@ -26,7 +26,7 @@ async def main():
 
     themes = load_themes()
 
-    current_theme = "SNOWY"
+    current_theme = "DESERT"
 
     road_texture, color_scheme = set_theme(current_theme, themes)
 
@@ -56,7 +56,7 @@ async def main():
             if event.type == pg.QUIT:
                 running = 0
                 
-        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_scheme)
+        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_scheme, car.angle * 82)
         
         vertical = 180
         x = car.x
