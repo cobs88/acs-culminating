@@ -51,9 +51,6 @@ current_bg = background_image1
 next_bg = background_image2
 bg_switch_progress = 0  # To track the blending progress
 
-# Button Images Loading
-exitImage = pygame.image.load('redx.png').convert_alpha()
-
 # Button setup
 class Button:
     def __init__(self, x, y, width, height, text, base_color, hover_color):
@@ -108,7 +105,7 @@ class Button:
         mouse_pos = pygame.mouse.get_pos()
         clicked = self.rect.collidepoint(mouse_pos) and pygame.mouse.get_pressed()[0]
         if clicked and not self.was_clicked:
-            self.was_clicked = True
+            self.was_clicked = True 
             click_sound.play()
             return True
         if not pygame.mouse.get_pressed()[0]:
@@ -145,9 +142,9 @@ settings_button = Button(WIDTH // 2 - 200, HEIGHT // 2 - 30, 400, 100, "Settings
 quit_button = Button(WIDTH // 2 - 200, HEIGHT // 2 + 90, 400, 100, "Quit", GRAY, DARK_GRAY)
 
 # Settings Menu
-close_button = Button(WIDTH - 200, 20, 50, 50, "", RED, RED)  # Adjusted position and size
 volume_slider = Slider(WIDTH // 2 - 150, HEIGHT // 2, 300, 1, 100, 50)
 day_night_toggle = Button(WIDTH // 2 - 150, HEIGHT // 2 + 100, 300, 50, "Day", DARK_YELLOW, DARK_YELLOW)
+close_button = Button(WIDTH // 2 - 150, day_night_toggle.rect.y + day_night_toggle.rect.height + 25, 300, 50, "Close", RED, RED)
 
 # Loading bar
 loading_width = 500
@@ -254,9 +251,12 @@ while running:
     else:
         screen.fill(DARK_GRAY if not is_day else GRAY)
 
+        close_button.draw(screen)
         volume_slider.draw(screen, DARK_YELLOW if is_day else BLUE)
         day_night_toggle.draw(screen)
-        close_button.draw(screen)
+        
+        if close_button.is_clicked():
+            in_settings = False
 
         # Display volume value
         volume_text = font_settings.render(f"Volume: {int(volume_slider.value)}", True, WHITE)
@@ -268,9 +268,6 @@ while running:
             day_night_toggle.text = "Day" if is_day else "Night"
             day_night_toggle.base_color = DARK_YELLOW if is_day else NAVY_BLUE
             day_night_toggle.hover_color = DARK_YELLOW if is_day else NAVY_BLUE
-
-        if close_button.is_clicked():
-            in_settings = False
 
         # Adjust volume
         background_sound.set_volume(volume_slider.value / 100)
