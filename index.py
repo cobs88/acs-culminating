@@ -22,25 +22,25 @@ DARK_YELLOW = (204, 153, 0)
 
 # Fonts and Assets
 pygame.font.init()
-font_title = pygame.font.Font('racing_font.ttf', 100)  # Cool racing font
-font_button = pygame.font.Font('racing_font.ttf', 50)  # Adjusted button font size
-font_loading = pygame.font.Font('racing_font.ttf', 40)  # Cool racing font
-font_settings = pygame.font.Font('racing_font.ttf', 30)  # For settings menu
+font_title = pygame.font.Font('assets/racing_font.ttf', 100)  # Cool racing font
+font_button = pygame.font.Font('assets/racing_font.ttf', 50)  # Adjusted button font size
+font_loading = pygame.font.Font('assets/racing_font.ttf', 40)  # Cool racing font
+font_settings = pygame.font.Font('assets/racing_font.ttf', 30)  # For settings menu
 
 # Sounds
 mixer.init()
-click_sound = mixer.Sound('click.wav')
-hover_sound = mixer.Sound('hover.wav')
-background_sound = mixer.Sound('background.wav')
+click_sound = mixer.Sound('assets/click.wav')
+hover_sound = mixer.Sound('assets/hover.wav')
+background_sound = mixer.Sound('assets/background.wav')
 background_sound.set_volume(0.5)  # Set initial volume to 50%
 
 # Screen setup
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pygame Prix")
 
-background_image1 = pygame.image.load('racing_bg.png')
+background_image1 = pygame.image.load('assets/racing_bg.png')
 background_image1 = pygame.transform.scale(background_image1, (WIDTH, HEIGHT))
-background_image2 = pygame.image.load('racing2_bg.png')
+background_image2 = pygame.image.load('assets/racing2_bg.png')
 background_image2 = pygame.transform.scale(background_image2, (WIDTH, HEIGHT))
 
 # Background panning variables
@@ -151,7 +151,7 @@ loading_width = 500
 loading_height = 20
 loading_x = (WIDTH - loading_width) // 2
 loading_y = HEIGHT // 2 - 100
-car_image = pygame.image.load('car.png')
+car_image = pygame.image.load('assets/car.png')
 car_image = pygame.transform.scale(car_image, (240, 120))
 
 # Main loop
