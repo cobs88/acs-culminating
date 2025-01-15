@@ -28,13 +28,11 @@ def draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_sche
 
     screen.fill(SKY_COLOR)
 
-    # Draw sun or moon based on time_of_day
     if time_of_day < 60:
         draw_sun(screen, SCREEN_WIDTH, SCREEN_HEIGHT, offset)
     else:
         draw_moon(screen, SCREEN_WIDTH, SCREEN_HEIGHT, offset)
     
-    # Adjust mountains with offset to simulate scrolling
     draw_mountain(screen, 0 - offset, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 2, MOUNTAIN_COLOR)  # Left large mountain
     draw_mountain(screen, SCREEN_WIDTH - SCREEN_WIDTH // 3 - offset, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 2, MOUNTAIN_COLOR)  # Right large mountain
     

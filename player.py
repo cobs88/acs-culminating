@@ -6,6 +6,7 @@ class Player():
         self.x = 0
         self.y = 500
         self.z = 0
+        self.target_angle = 0
         self.angle = 0
         self.velocity = 0
         self.acceleration = 0
@@ -14,6 +15,9 @@ class Player():
 
         self.prev_angle = 0
         self.angle_change = 0
+
+        self.width = 80
+        self.height = 50
 
     def controls(self, delta):
         pressed_keys = pg.key.get_pressed()
@@ -34,17 +38,19 @@ class Player():
                 self.acceleration = 0
                 self.velocity += -self.velocity*delta
         if pressed_keys[pg.K_a] or pressed_keys[pg.K_LEFT]:
-            self.angle -= delta*self.velocity/30
+            self.target_angle -= delta*self.velocity/30
         elif pressed_keys[pg.K_d] or pressed_keys[pg.K_RIGHT]:
-            self.angle += delta*self.velocity/30
+            self.target_angle += delta*self.velocity/30
 
         self.velocity = max(-10, min(self.velocity, 20))
-        self.angle = max(-0.8, (min(0.8, self.angle)))
+        self.target_angle = max(-0.8, (min(0.8, self.target_angle)))
         self.velocity += self.acceleration*delta
         self.x += self.velocity*delta*math.cos(self.angle)
         self.y += self.velocity*math.sin(self.angle)*delta*100
         self.y = max(-1000, self.y)
         self.y = min(1000, self.y)
+        angle_smoothing_factor = 5
+        self.angle += (self.target_angle - self.angle) * delta * angle_smoothing_factor
 
         self.angle_change = self.angle - self.prev_angle
 
@@ -54,3 +60,9 @@ class Player():
         self.sprite_offset += (target_offset - self.sprite_offset) * delta * smoothing_factor
 
         self.prev_angle = self.angle
+
+    def get_hitbox(self, coordinate):
+        hitbox_x = coordinate[0] + 3
+        hitbox_y = coordinate[1] + 20
+        return pg.Rect(hitbox_x, hitbox_y, self.width, self.height)
+
