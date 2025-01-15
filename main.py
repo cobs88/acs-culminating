@@ -64,11 +64,10 @@ async def main():
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 if home_rect.collidepoint(event.pos):
                     pg.quit()
-                    subprocess.run(["python", "PyGameProject/index.py"])  # Execute main.py in a new process
+                    subprocess.run(["python", "PyGameProject/index.py"])
                     sys.exit()
-                    running = False  # Close the current game window after opening index.py
+                    running = False
 
-        # Draw the game elements
         draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, 0, color_scheme)
 
         vertical = 180
