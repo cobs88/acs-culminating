@@ -1,12 +1,16 @@
 import pygame, sys
 from pygame.locals import *
 from pygame import mixer
+from main import main
+import asyncio
+import subprocess
 
 # Initialize Pygame
 pygame.init()
 
 # Screen dimensions
 WIDTH, HEIGHT = 1920, 1080
+FPS = 60
 
 # Colors
 WHITE = (255, 255, 255)
@@ -151,14 +155,17 @@ loading_width = 500
 loading_height = 20
 loading_x = (WIDTH - loading_width) // 2
 loading_y = HEIGHT // 2 - 100
-car_image = pygame.image.load('car.png')
+car_image = pygame.image.load('assets/car.png')
 car_image = pygame.transform.scale(car_image, (240, 120))
 
 # Main loop
+# Main menu loop (starts after loading)
 loading_progress = 0
 loading = True
 in_settings = False
 is_day = True  # Day/Night state
+
+# Loading screen loop
 while loading:
     screen.blit(background_image1, (0, 0))
     title_surface = font_title.render("PyGame Pri><", True, WHITE)
@@ -196,6 +203,7 @@ while loading:
 # Play background sound on loop
 background_sound.play(loops=-1)
 
+# Main menu loop
 running = True
 while running:
     for event in pygame.event.get():
@@ -205,10 +213,6 @@ while running:
 
         if in_settings:
             volume_slider.handle_event(event)
-
-    # Play click sound for general clicks
-    if pygame.mouse.get_pressed()[0]:
-        click_sound.play()
 
     # Main menu logic
     if not in_settings:
@@ -240,21 +244,33 @@ while running:
 
         # Check button clicks
         if play_button.is_clicked():
-            print("Play game!")  # Replace with game start logic
+            pygame.quit()  # Close the current game
+            try:
+                subprocess.run(["python", "PyGameProject/main.py"])  # Execute main.py in a new process
+            except Exception as e:
+                print(f"Error launching game: {e}")
+            sys.exit()  # Ensure the current script exits
         if settings_button.is_clicked():
             in_settings = True
-        if quit_button.is_clicked():
+        if not in_settings and quit_button.is_clicked():
             pygame.quit()
             sys.exit()
 
     # Settings menu logic
     else:
         screen.fill(DARK_GRAY if not is_day else GRAY)
-
+        
+        # Render "Settings" title
+        settings_title = font_title.render("Settings", True, WHITE)
+        screen.blit(settings_title, (WIDTH // 2 - settings_title.get_width() // 2, 50))
+        
         close_button.draw(screen)
         volume_slider.draw(screen, DARK_YELLOW if is_day else BLUE)
         day_night_toggle.draw(screen)
         
+        if quit_button.is_clicked():
+            pass
+
         if close_button.is_clicked():
             in_settings = False
 
@@ -272,4 +288,5 @@ while running:
         # Adjust volume
         background_sound.set_volume(volume_slider.value / 100)
 
+    # Ensure the screen updates every frame
     pygame.display.update()
