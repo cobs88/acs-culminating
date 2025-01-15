@@ -20,9 +20,9 @@ def calc_z(x):
 
 def draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_scheme, offset):
     if time_of_day < 60:
-        SKY_COLOR = (35, 206, 235)  # Daytime sky color
+        SKY_COLOR = (35, 206, 235)
     else:
-        SKY_COLOR = (48, 25, 52)  # Nighttime sky color
+        SKY_COLOR = (48, 25, 52)
 
     MOUNTAIN_COLOR = tuple(x - 30 for x in color_scheme)
 

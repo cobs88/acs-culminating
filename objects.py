@@ -163,7 +163,7 @@ class Helicopter(GameObject):
 
     def render(self, screen, car, z_buffer):
         scale = max(0.0001, 1 / (self.x - car.x))
-        render_element(screen, self.sprite, scale * self.w_scale_factor, scale * self.h_scale_factor, scale, self.x, car, self.y, -self.z, z_buffer)
+        render_element(screen, self.sprite, scale * self.w_scale_factor, scale * self.h_scale_factor, scale, self.x, car, self.y + car.y, -self.z, z_buffer)
 
     def get_hitbox(self, car):
         scale = max(0.0001, 1 / (self.x - car.x))

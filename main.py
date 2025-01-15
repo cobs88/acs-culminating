@@ -68,7 +68,7 @@ async def main():
                     sys.exit()
                     running = False
 
-        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, 0, color_scheme)
+        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, 0, color_scheme, car.angle * 82)
 
         vertical = 180
         x = car.x
@@ -96,7 +96,7 @@ async def main():
                 )
 
                 pg.draw.rect(screen, color, (0, vertical, SCREEN_WIDTH, 1))
-                render_element(screen, road_slice, 500*scale, 1, scale, x, car, car.y, z_buffer)
+                render_element(screen, road_slice, 500*scale, 1, scale, x, car, car.y, 0, z_buffer)
         
         for i in range(len(game_objects) - 1, -1, -1):
             obj = game_objects[i]
