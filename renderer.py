@@ -1,9 +1,9 @@
 import math
 import pygame as pg
 
-def render_element(screen, sprite, width, height, scale, x, car, y, z_buffer):
+def render_element(screen, sprite, width, height, scale, x, car, y, z, z_buffer):
     y = calc_y(x) - y
-    z = calc_z(x) - car.z
+    z = calc_z(x) - (car.z - z)
 
     vertical = int(60+160*scale + z*scale)
     if vertical >= 1 and vertical < 180 and z_buffer[vertical-1] > 1/scale - 10:

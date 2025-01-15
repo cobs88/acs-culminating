@@ -11,10 +11,11 @@ class GameObject:
         self.h_scale_factor = 200
         self.x = distance
         self.y = None
+        self.z = 0
         
     def render(self, screen, car, z_buffer):
         scale = max(0.0001, 1 / (self.x - car.x))
-        render_element(screen, self.sprite, scale * self.w_scale_factor, scale * self.h_scale_factor, scale, self.x, car, self.y + car.y, z_buffer)
+        render_element(screen, self.sprite, scale * self.w_scale_factor, scale * self.h_scale_factor, scale, self.x, car, self.y + car.y, 0, z_buffer)
 
     def get_hitbox(self, car):
         scale = max(0.0001, 1 / (self.x - car.x))
@@ -142,6 +143,45 @@ class Tree(StaticObject):
 
             return pg.Rect(hitbox_x, hitbox_y, trunk_width, trunk_height)
         return None
+
+class Helicopter(GameObject):
+    def __init__(self, distance):
+        super().__init__(distance)
+
+        self.sprite = pg.image.load("assets/helicopter.png").convert_alpha()
+
+        self.x = distance
+        self.y = -70
+
+        self.w_scale_factor = 2000
+        self.h_scale_factor = 1000
+
+    def update(self, delta, car):
+        self.z = 350
+        self.x = car.x + 20
+        self.y = car.y + 450
+
+    def render(self, screen, car, z_buffer):
+        scale = max(0.0001, 1 / (self.x - car.x))
+        render_element(screen, self.sprite, scale * self.w_scale_factor, scale * self.h_scale_factor, scale, self.x, car, self.y, -self.z, z_buffer)
+
+    def get_hitbox(self, car):
+        scale = max(0.0001, 1 / (self.x - car.x))
+        y = calc_y(self.x) - (self.y + car.y)
+        z = calc_z(self.x) - car.z - self.z
+
+        vertical = int(60 + 160 * scale + z * scale)
+        if vertical >= 1 and vertical < 180:
+            horizontal = 160 - (160 - y) * scale + car.angle * (vertical - 150)
+
+            hitbox_width = scale * self.w_scale_factor
+            hitbox_height = scale * self.h_scale_factor
+
+            return pg.Rect(horizontal, vertical - hitbox_height + 1, hitbox_width, hitbox_height)
+        return None
+
+        
+    
 
 class OncomingCar(GameObject):
     def __init__(self, distance):

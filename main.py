@@ -4,7 +4,7 @@ import sys, platform, math, random
 
 from player import Player
 from themes import load_themes, set_theme
-from objects import OncomingCar, StaticObject
+from objects import OncomingCar, StaticObject, Helicopter
 from renderer import render_element, draw_background
 
 async def main():
@@ -26,13 +26,15 @@ async def main():
 
     themes = load_themes()
 
-    current_theme = "SNOWY"
+    current_theme = "DESERT"
 
     road_texture, color_scheme = set_theme(current_theme, themes)
 
     car = Player()
 
     game_objects = []
+
+    game_objects.append(Helicopter(car.x + 20))
 
     for i in range(3):
         distance = car.x + i * 50 + random.randint(-10, 10)
@@ -84,7 +86,7 @@ async def main():
                 )
 
                 pg.draw.rect(screen, color, (0, vertical, SCREEN_WIDTH, 1))
-                render_element(screen, road_slice, 500*scale, 1, scale, x, car, car.y, z_buffer)
+                render_element(screen, road_slice, 500*scale, 1, scale, x, car, car.y, 0, z_buffer)
         
         for i in range(len(game_objects) - 1, -1, -1):
             obj = game_objects[i]
@@ -98,16 +100,12 @@ async def main():
         game_objects = sorted(game_objects, key=lambda obj: obj.x)
 
         car_hitbox = car.get_hitbox((SCREEN_WIDTH/2 - 43.5 - car.sprite_offset, SCREEN_HEIGHT/2))
-        pg.draw.rect(screen, (255, 0, 0), car_hitbox, 2)
 
         for obj in game_objects:
             obj.update(delta, car)
         
         for obj in reversed(game_objects):
             obj.render(screen, car, z_buffer)
-            hitbox = obj.get_hitbox(car)
-            if hitbox is not None:
-                pg.draw.rect(screen, (255, 0, 0), hitbox, 2)
 
             if abs(obj.x - car.x) <= 2:
                 hitbox = obj.get_hitbox(car)
