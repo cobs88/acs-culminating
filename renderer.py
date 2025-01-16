@@ -18,30 +18,74 @@ def calc_y(x):
 def calc_z(x):
     return 200+80*math.sin(x/13) - 120*math.sin(x/7)
 
-def draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_scheme, offset):
-    # Sky transition from day to night
-    if time_of_day < 60:  # Daytime to sunset
+def draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time, color_scheme, offset):
+    time_of_day = (time % 240)
+    print(time_of_day)
+    SKY_COLOR = (48, 25, 10)
+    #0 - 15
+    if time_of_day < 15:
+        t = (time_of_day % 15) / 15
         SKY_COLOR = (
-            int(35 + (time_of_day / 60) * (48 - 35)),
-            int(206 + (time_of_day / 60) * (25 - 206)),
-            int(235 + (time_of_day / 60) * (52 - 235))
+            int(15 + t * (255 - 15)),
+            int(78 + t * (102 - 78)),
+            int(128 + t * (0 - 128))
         )
-    else:  # Sunset to night
+    #15 - 30
+    elif time_of_day < 30:
+        t = (time_of_day % 15) / 15
         SKY_COLOR = (
-            int(48 + ((time_of_day - 60) / 60) * (0 - 48)),
-            int(25 + ((time_of_day - 60) / 60) * (0 - 25)),
-            int(52 + ((time_of_day - 60) / 60) * (10 - 52))
+            int(255 + t * (135 - 255)),
+            int(102 + t * (206 - 102)),
+            int(0 + t * (235 - 0))
         )
+    # 30 - 90
+    elif time_of_day < 90:
+        SKY_COLOR = (135, 206, 235)
 
+    # 90 - 105
+    elif time_of_day < 105:
+        t = (time_of_day % 15) / 15
+        SKY_COLOR = (
+            int(135 + t * (255 - 135)),
+            int(206 + t * (69 - 206)),
+            int(235 + t * (0 - 235))
+        )
+    #105 - 120
+    elif time_of_day < 120:
+        t = (time_of_day % 15) / 15
+        SKY_COLOR = (
+            int(255 + t * (155 - 255)),
+            int(69 + t * (14 - 69)),
+            int(0 + t * (42 - 0))
+        )
+    #120 -150
+    elif time_of_day < 150:
+        t = (time_of_day % 30) / 30
+        SKY_COLOR = (
+            int(155 + t * (0 - 155)),
+            int(14 + t * (31 - 14)),
+            int(42 + t * (61 - 42))
+        )
+    # 150 - 210
+    elif time_of_day < 210:
+        SKY_COLOR = (0, 31, 61)
+    #210 - 240
+    else:
+        t = (time_of_day % 30) / 30
+        SKY_COLOR = (
+            int(0 + t * (15 - 0)),
+            int(31 + t * (78 - 31)),
+            int(61 + t * (128 - 61))
+        )
     MOUNTAIN_COLOR = tuple(x - 30 for x in color_scheme)
 
     screen.fill(SKY_COLOR)
 
-    if time_of_day < 60:
-        draw_sun(screen, SCREEN_WIDTH, SCREEN_HEIGHT, offset, time_of_day)
-    else:
-        draw_moon(screen, SCREEN_WIDTH, SCREEN_HEIGHT, offset, time_of_day)
+    draw_sun(screen, SCREEN_WIDTH, SCREEN_HEIGHT, offset, time_of_day)
+    draw_moon(screen, SCREEN_WIDTH, SCREEN_HEIGHT, offset, time_of_day)
 
+
+    # Draw mountains at varying layers based on the offset
     draw_mountain(screen, 0 - offset, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 2, MOUNTAIN_COLOR)  # Left large mountain
     draw_mountain(screen, SCREEN_WIDTH - SCREEN_WIDTH // 3 - offset, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 2, MOUNTAIN_COLOR)  # Right large mountain
     
@@ -52,11 +96,36 @@ def draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_sche
     draw_mountain(screen, SCREEN_WIDTH // 1.75 - offset, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 2 + 60, MOUNTAIN_COLOR)  # Mid smaller mountain (other side)
 
 def draw_sun(screen, SCREEN_WIDTH, SCREEN_HEIGHT, offset, time_of_day):
-    sun_pos = int(time_of_day / 60 * SCREEN_HEIGHT)  # Sun moves downward during the day
+    #sun rise 0-30
+    if time_of_day < 30:
+        t = (time_of_day % 30) / 30
+        sun_pos = int(SCREEN_HEIGHT// 2 + t * (SCREEN_HEIGHT // 4 - SCREEN_HEIGHT//2))
+    #daytime 30 - 90
+    elif time_of_day < 90:
+        sun_pos = SCREEN_HEIGHT // 4
+    #sunset 90 - 120
+    elif time_of_day < 120:
+        t = (time_of_day - 90) / 30
+        sun_pos = int(SCREEN_HEIGHT// 4 + t * (SCREEN_HEIGHT // 2 - SCREEN_HEIGHT//4))
+    else:
+        sun_pos = SCREEN_HEIGHT // 2
     pg.draw.circle(screen, (255, 223, 0), (SCREEN_WIDTH // 2 - offset*1.05, sun_pos), 30)
 
 def draw_moon(screen, SCREEN_WIDTH, SCREEN_HEIGHT, offset, time_of_day):
-    moon_pos = int((time_of_day - 60) / 60 * SCREEN_HEIGHT)  # Moon moves downward from the top during the night
+    if time_of_day < 120:
+        moon_pos = SCREEN_HEIGHT // 2
+    #moonrise 120-150
+    elif time_of_day < 150:
+        t = (time_of_day - 120) / 30
+        moon_pos = int(SCREEN_HEIGHT// 2 + t * (SCREEN_HEIGHT // 4 - SCREEN_HEIGHT//2))
+    #nighttime 150-210
+    elif time_of_day < 210:
+        moon_pos = SCREEN_HEIGHT//4
+    #moonset 210-240
+    elif time_of_day < 240:
+        t = (time_of_day - 210) / 30
+        moon_pos = int(SCREEN_HEIGHT// 4 + t * (SCREEN_HEIGHT // 2 - SCREEN_HEIGHT//4))
+
     pg.draw.circle(screen, (255, 255, 255), (SCREEN_WIDTH // 2 - offset, moon_pos), 25)
     pg.draw.circle(screen, (200, 200, 200), (SCREEN_WIDTH // 2 + 5 - offset, moon_pos - 5), 20)  # Shadow effect
 

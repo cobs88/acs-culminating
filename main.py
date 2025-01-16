@@ -52,7 +52,7 @@ async def main():
         game_objects.append(obstacle)
 
     running = True
-    time_of_day = 0  # Track time of day, 0 for sunrise, 60 for sunset
+    time = 0  # Track time of day, 0 for sunrise, 60 for sunset
 
     while running:
         delta = clock.tick(FPS) / 1000
@@ -70,9 +70,9 @@ async def main():
                     running = False
 
         # Update time of day
-        time_of_day = (time_of_day + 0.1) % 120  #Time of day loops after 120 seconds to sunrise
+        time += delta
 
-        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_scheme, car.angle * 82)
+        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time, color_scheme, car.angle * 82)
 
         vertical = 180
         x = car.x
@@ -133,12 +133,14 @@ async def main():
                 if hitbox is not None:
                     collision = obj.check_collision(car, car_hitbox)
                     if collision:
+                        '''
                         pg.quit() 
                         try:
                             subprocess.run(["python", "PyGameProject/gameover.py"])  
                         except Exception as e:
                             print(f"Error launching game: {e}")
                         sys.exit()  
+                        '''
 
         screen.blit(car_sprite, (SCREEN_WIDTH/2 - 43.5 - car.sprite_offset, SCREEN_HEIGHT/2))
 
