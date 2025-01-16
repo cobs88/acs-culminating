@@ -156,10 +156,14 @@ class Helicopter(GameObject):
         self.w_scale_factor = 2000
         self.h_scale_factor = 1000
 
+        self.timer = 0
+
     def update(self, delta, car):
         self.z = 350
         self.x = car.x + 20
         self.y = car.y + 450
+        self.timer += delta
+        
 
     def render(self, screen, car, z_buffer):
         scale = max(0.0001, 1 / (self.x - car.x))
@@ -180,9 +184,24 @@ class Helicopter(GameObject):
             return pg.Rect(horizontal, vertical - hitbox_height + 1, hitbox_width, hitbox_height)
         return None
 
-        
-    
+class Target(GameObject):
+    def __init__(self, distance, car):
+        super().__init__(distance)
 
+        self.sprite = pg.image.load("assets/target.png").convert_alpha()
+
+        self.x = distance
+        self.y = -car.y
+
+        self.w_scale_factor = 150
+        self.h_scale_factor = 75
+
+    def update(self, delta, car):
+        self.x += 3*delta
+        if self.x < car.x + 1:
+            return "DESTROY"
+        return False
+    
 class OncomingCar(GameObject):
     def __init__(self, distance):
         super().__init__(distance)

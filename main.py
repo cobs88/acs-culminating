@@ -5,7 +5,7 @@ import subprocess  # Import subprocess module
 
 from player import Player
 from themes import load_themes, set_theme
-from objects import OncomingCar, StaticObject, Helicopter
+from objects import OncomingCar, StaticObject, Helicopter, Target
 from renderer import render_element, draw_background
 
 async def main():
@@ -98,10 +98,18 @@ async def main():
                 pg.draw.rect(screen, color, (0, vertical, SCREEN_WIDTH, 1))
                 render_element(screen, road_slice, 500*scale, 1, scale, x, car, car.y, 0, z_buffer)
         
+        for obj in game_objects:
+            if isinstance(obj, Helicopter) and obj.timer >= 5:
+                target = Target(car.x + 20, car)
+                game_objects.append(target)
+                obj.timer = 0
+                
         for i in range(len(game_objects) - 1, -1, -1):
             obj = game_objects[i]
             isbehindcar = obj.update(delta, car)
-            if isbehindcar:
+            if isbehindcar == "DESTROY":
+                game_objects.pop(i)
+            elif isbehindcar:
                 new_object = obj.__class__(car.x + 130 + random.randint(-10, 10))
                 game_objects.append(new_object)
                 game_objects.pop(i)
