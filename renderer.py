@@ -20,7 +20,6 @@ def calc_z(x):
 
 def draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time, color_scheme, offset):
     time_of_day = (time % 240)
-    print(time_of_day)
     SKY_COLOR = (48, 25, 10)
     #0 - 15
     if time_of_day < 15:
