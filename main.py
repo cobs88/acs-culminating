@@ -126,12 +126,18 @@ async def main():
         game_objects = sorted(game_objects, key=lambda obj: obj.x)
 
         car_hitbox = car.get_hitbox((SCREEN_WIDTH/2 - 43.5 - car.sprite_offset, SCREEN_HEIGHT/2))
+        #pg.draw.rect(screen, (255, 0, 0), car_hitbox, 2)
 
         for obj in game_objects:
             obj.update(delta, car)
 
         for obj in reversed(game_objects):
             obj.render(screen, car, z_buffer)
+            '''
+            hitbox = obj.get_hitbox(car)
+            if hitbox is not None:
+                pg.draw.rect(screen, (255, 0, 0), hitbox, 2)
+            '''
         
             if abs(obj.x - car.x) <= 2:
                 hitbox = obj.get_hitbox(car)
