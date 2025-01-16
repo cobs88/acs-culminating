@@ -125,7 +125,12 @@ async def main():
                 if hitbox is not None:
                     collision = obj.check_collision(car, car_hitbox)
                     if collision:
-                        print("collision!")
+                        pg.quit() 
+                        try:
+                            subprocess.run(["python", "PyGameProject/gameover.py"])  
+                        except Exception as e:
+                            print(f"Error launching game: {e}")
+                        sys.exit()  
 
         screen.blit(car_sprite, (SCREEN_WIDTH/2 - 43.5 - car.sprite_offset, SCREEN_HEIGHT/2))
 
