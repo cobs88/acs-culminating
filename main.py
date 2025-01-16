@@ -6,7 +6,7 @@ import subprocess  # Import subprocess module
 from player import Player
 from themes import load_themes, set_theme
 from objects import OncomingCar, StaticObject, Helicopter
-from renderer import render_element, draw_background
+from renderer import render_element, draw_background, calc_z, calc_y
 
 async def main():
     SCREEN_WIDTH = 320
@@ -52,6 +52,7 @@ async def main():
         game_objects.append(obstacle)
 
     running = True
+    time_of_day = 0  # Track time of day, 0 for sunrise, 60 for sunset
 
     while running:
         delta = clock.tick(FPS) / 1000
@@ -68,7 +69,10 @@ async def main():
                     sys.exit()
                     running = False
 
-        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, 0, color_scheme, car.angle * 82)
+        # Update time of day
+        time_of_day = (time_of_day + 0.1) % 120  #Time of day loops after 120 seconds to sunrise
+
+        draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time_of_day, color_scheme, car.angle * 82)
 
         vertical = 180
         x = car.x
