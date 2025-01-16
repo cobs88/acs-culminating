@@ -26,7 +26,7 @@ async def main():
     car_sprite.set_colorkey((255, 0, 255))
     car_sprite = pg.transform.scale(car_sprite, (int(car_sprite.get_size()[0]/3), int(car_sprite.get_size()[1]/3)))
 
-    # Load themes and gear icon
+    # Load themes and home icon (Saif 29 - 33)
     themes = load_themes()
     home_icon = pg.image.load("assets/home.png").convert_alpha()
     home_icon = pg.transform.scale(home_icon, (25, 25))  # Resize gear icon
@@ -62,7 +62,7 @@ async def main():
             if event.type == pg.QUIT:
                 running = False
 
-            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1: #Saif 65 - 70
                 if home_rect.collidepoint(event.pos):
                     pg.quit()
                     subprocess.run(["python", "PyGameProject/index.py"])
@@ -133,14 +133,13 @@ async def main():
                 if hitbox is not None:
                     collision = obj.check_collision(car, car_hitbox)
                     if collision:
-                        '''
                         pg.quit() 
                         try:
                             subprocess.run(["python", "PyGameProject/gameover.py"])  
                         except Exception as e:
                             print(f"Error launching game: {e}")
                         sys.exit()  
-                        '''
+                        
 
         screen.blit(car_sprite, (SCREEN_WIDTH/2 - 43.5 - car.sprite_offset, SCREEN_HEIGHT/2))
 
