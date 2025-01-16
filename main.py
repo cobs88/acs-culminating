@@ -12,6 +12,8 @@ async def main():
     SCREEN_WIDTH = 320
     SCREEN_HEIGHT = 180
 
+    boss_spawned = False
+
     FPS = 60
 
     screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.SCALED)
@@ -39,8 +41,6 @@ async def main():
     car = Player()
 
     game_objects = []
-
-    game_objects.append(Helicopter(car.x + 20))
 
     for i in range(3):
         distance = car.x + i * 50 + random.randint(-10, 10)
@@ -70,7 +70,12 @@ async def main():
                     running = False
 
         # Update time of day
-        time += delta
+        time += delta * 3
+
+        if boss_spawned == False and time >= 150:
+            game_objects.append(Helicopter(car.x + 20))
+            boss_spawned = True
+
 
         draw_background(screen, SCREEN_WIDTH, SCREEN_HEIGHT, time, color_scheme, car.angle * 82)
 
