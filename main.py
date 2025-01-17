@@ -87,9 +87,9 @@ async def main():
         if boss_spawned == False and time_of_day >= 150:
             game_objects.append(Helicopter(car.x + 20))
             boss_spawned = True
-
+        keys = pg.key.get_pressed()
         # Update score only if W or UP key is pressed
-        if keys[pg.K_w] or keys[pg.K_UP]:
+        if keys[pg.K_w] or keys[pg.K_UP] and not game_over:
             score_time += delta
             if score_time >= 1:
                 score += 10
