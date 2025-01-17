@@ -19,6 +19,8 @@ class Player():
         self.width = 80
         self.height = 50
 
+        self.destroyed = False
+
     def controls(self, delta):
         pressed_keys = pg.key.get_pressed()
         self.acceleration += -0.5*self.acceleration*delta

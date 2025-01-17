@@ -135,3 +135,14 @@ def draw_mountain(screen, x_offset, width, height, color):
         (x_offset + width, height) 
     ]
     pg.draw.polygon(screen, color, points)
+
+def render_explosion(screen, path, frame_counter, x, y, scale=1.0, tile_count=16):
+    frame = frame_counter % tile_count
+
+    tile_path = f"{path}/tile{frame:03}.png"
+    tile = pg.image.load(tile_path).convert_alpha()
+
+    width, height = tile.get_size()
+    scaled_tile = pg.transform.scale(tile, (int(width * scale), int(height * scale)))
+
+    screen.blit(scaled_tile, (x - width // 2, y - height // 2))
