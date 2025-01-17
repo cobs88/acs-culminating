@@ -57,8 +57,8 @@ class Player():
         self.angle_change = self.angle - self.prev_angle
 
 
-        target_offset = self.angle_change * 5000
-        smoothing_factor = 1
+        target_offset = self.angle_change * 6000
+        smoothing_factor = 1.2
         self.sprite_offset += (target_offset - self.sprite_offset) * delta * smoothing_factor
 
         self.prev_angle = self.angle
